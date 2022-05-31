@@ -211,7 +211,7 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
             free = true;
         }
         public void Cancel() {
-            if (_playback.IsRunning)
+            if (!free)
             {
                 _playback.Stop();
                 outputDevice.Dispose();
