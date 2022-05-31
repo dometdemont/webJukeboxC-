@@ -13,18 +13,19 @@ namespace WebJukebox.Pages
     {
         public string Message { get; private set; } = "PageModel in C#";
         private static Title[] playList = {
-            new Title("LISZT.MID", "Franz Liszt : Prélude et Fugue sur B.A.C.H. (10')", "15, 617, 20"),
-            new Title("MESSIAEN.MID", "Olivier Messiaen : Banquet céleste (6')", "5, 375, 19"),
-            new Title("ASCENSIO.MID", "Olivier Messiaen : Prière du Christ montant vers son Père (7')", "8, 425, 10"),
-            new Title("WAGNER.MID", "Richard Wagner : Mort d'Isolde (8'40)", "8, 520, 20"),
-            new Title("DUPRE.MID", "Marcel Dupré : Prélude et Fugue en sol mineur (7')", "12, 403, 10"),
-            new Title("COUPERIN.MID", "François Couperin : Tierce en taille (4')", "6, 240, 20"),
-            new Title("FRANCK.MID", "César Franck : Troisième Choral (10'20)", "13, 622, 20"),
-            new Title("CHROMORN.MID", "François Couperin : Chromorne en taille (4')", "7, 233, 20"),
-            new Title("TOCAREM.MID", "J.S. Bach: Toccata en Ré mineur (2'30)", "2, 145, 5"),
-            new Title("LANGLAIS.MID", "Jean Langlais : Chant de Paix (2'30)", "6, 150, 4"),
-            new Title("GUILMANT.MID", "Alexandre Guilmant : Noël 'Or dites-nous Marie' (2'20)", "6, 130, 4")
+            new Title("LISZT.MID", "Franz Liszt : Prélude et Fugue sur B.A.C.H. (10')", "15, 617, 20", "https://fr.wikipedia.org/wiki/Fantasie_und_Fuge_%C3%BCber_das_Thema_B-A-C-H#p-lang-btn"),
+            new Title("MESSIAEN.MID", "Olivier Messiaen : Banquet céleste (6')", "5, 375, 19", "https://en.wikipedia.org/wiki/Le_Banquet_C%C3%A9leste#p-lang-btn"),
+            new Title("ASCENSIO.MID", "Olivier Messiaen : Prière du Christ montant vers son Père (7')", "8, 425, 10", "https://fr.wikipedia.org/wiki/Olivier_Messiaen#p-lang-btn"),
+            new Title("WAGNER.MID", "Richard Wagner : Mort de Isolde (8'40)", "8, 510, 2", "https://fr.wikipedia.org/wiki/Liebestod#p-lang-btn"),
+            new Title("DUPRE.MID", "Marcel Dupré : Prélude et Fugue en sol mineur (7')", "12, 403, 10", "https://fr.wikipedia.org/wiki/Marcel_Dupr%C3%A9#p-lang-btn"),
+            new Title("COUPERIN.MID", "François Couperin : Tierce en taille (4')", "6, 240, 2", "https://fr.wikipedia.org/wiki/Fran%C3%A7ois_Couperin#p-lang-btn"),
+            new Title("FRANCK.MID", "César Franck : Troisième Choral (10'20)", "13, 622, 20", "https://fr.wikipedia.org/wiki/C%C3%A9sar_Franck#p-lang-btn"),
+            new Title("CHROMORN.MID", "François Couperin : Chromorne en taille (4')", "5, 233, 20", "https://fr.wikipedia.org/wiki/Fran%C3%A7ois_Couperin#p-lang-btn"),
+            new Title("TOCAREM.MID", "J.S. Bach: Toccata en Ré mineur (2'30)", "2, 145, 5", "https://fr.wikipedia.org/wiki/Toccata_et_fugue_en_r%C3%A9_mineur#p-lang-btn"),
+            new Title("LANGLAIS.MID", "Jean Langlais : Chant de Paix (2'30)", "4, 150, 4", "https://fr.wikipedia.org/wiki/Jean_Langlais#p-lang-btn"),
+            new Title("GUILMANT.MID", "Alexandre Guilmant : Noël 'Or dites-nous Marie' (2'20)", "6, 130, 4", "https://fr.wikipedia.org/wiki/Alexandre_Guilmant#p-lang-btn")
         };
+        private static string CatalogPath="C:/Users/domin/Desktop/Jukebox/";
 
         private static int stopId = playList.Length;
         private static int pauseId = stopId+1;
@@ -49,8 +50,22 @@ namespace WebJukebox.Pages
             };
             Message += "</ul>";
             Message += "<table><tr>";
-            Message += "<td align=right><a href='/'> Actualiser</a></td>";
-            Message += "</tr></table>";
+            if(OutputDevice.GetDevicesCount() > 0)
+            {
+                OutputDevice lastMidiDevice = OutputDevice.GetByIndex(OutputDevice.GetDevicesCount() - 1);
+                Title.SetMidiDevice(lastMidiDevice);
+                Title.SetCatalogPath(CatalogPath);
+                Message += @"<td align=left><ul>";
+                Message += "<li>Périphérique de sortie MIDI : " + lastMidiDevice.Name;
+                Message += "<li>Répertoire du catalogue : " + CatalogPath;
+                Message += "</ul></td>";
+                Message += "<td align=right><a href='/'> Actualiser</a></td>";
+                Message += "</tr></table>";
+            } else
+            {
+                Message = "<h3>Aucun périphérique de sortie MIDI détecté/h3>";
+            }
+            
         }
         private void Current()
         {
@@ -68,6 +83,10 @@ namespace WebJukebox.Pages
 
             Message += "<td align=right><a id='refresh' href='/'> Actualiser</a></td>";
             Message += "</tr></table>";
+            if (currentTitle.doc != null)
+            {
+                Message += @"<iframe width=100% height=500px src=""" + currentTitle.doc+@""" title=""Wikipedia""></iframe> ";
+            }
         }
         private void CountDown() 
         { 
@@ -160,18 +179,19 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
         private static Playback _playback;
         private static OutputDevice outputDevice;
         private static bool free = true;
-        private string playlistPath = "C:/Users/domin/Desktop/Jukebox/";
-        private string midiOutputDevice = "Microsoft GS Wavetable Synth";//"USB MIDI Interface";
+        private static string playlistPath;
 
-        public Title(string aFile, string aDescription, string aTiming)
+        public Title(string aFile, string aDescription, string aTiming, string? aDoc)
         {
             file = aFile;
             description = aDescription;
             timing = aTiming;
+            doc = aDoc;
         }
         public static bool IsPlaying() { return _playback != null && _playback.IsRunning; }
         public static bool IsFree() { return free; }
-
+        public static void SetMidiDevice(OutputDevice d) { outputDevice = d; }
+        public static void SetCatalogPath(string p) { playlistPath = p; }
         public static double GetElapsed() {
             if (_playback == null) return 0;
             MetricTimeSpan result = (MetricTimeSpan)_playback.GetCurrentTime(TimeSpanType.Metric);
@@ -179,9 +199,6 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
         }
         public void Start() {
             var midiFile = MidiFile.Read(playlistPath+file);
-
-            outputDevice = OutputDevice.GetByName(midiOutputDevice);
-
             _playback = midiFile.GetPlayback(outputDevice);
             _playback.Start();
             _playback.Finished += OnFinished;
@@ -207,6 +224,7 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
         public string file;
         public string description;
         public string timing;
+        public string doc;
     };
 
  }
