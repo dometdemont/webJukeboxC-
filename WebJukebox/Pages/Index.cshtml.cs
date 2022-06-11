@@ -11,19 +11,22 @@ namespace WebJukebox.Pages
 {
     public class IndexModel : PageModel
     {
+        // Message receives the dynamic html code
         public string Message { get; private set; } = "PageModel in C#";
+        private static readonly string d3m = "Dominique Domet de Mont";
+        private static readonly string lml = "Louis-Marie Lardic";
         private static Title[] playList = {
-            new Title("LISZT.MID", "Franz Liszt : Prélude et Fugue sur B.A.C.H. (10')", "15, 617, 20", "https://fr.wikipedia.org/wiki/Fantasie_und_Fuge_%C3%BCber_das_Thema_B-A-C-H#p-lang-btn"),
-            new Title("MESSIAEN.MID", "Olivier Messiaen : Banquet céleste (6')", "5, 375, 19", "https://en.wikipedia.org/wiki/Le_Banquet_C%C3%A9leste#p-lang-btn"),
-            new Title("ASCENSIO.MID", "Olivier Messiaen : Prière du Christ montant vers son Père (7')", "8, 425, 10", "https://fr.wikipedia.org/wiki/Olivier_Messiaen#p-lang-btn"),
-            new Title("WAGNER.MID", "Richard Wagner : Mort de Isolde (8'40)", "8, 510, 2", "https://fr.wikipedia.org/wiki/Liebestod#p-lang-btn"),
-            new Title("DUPRE.MID", "Marcel Dupré : Prélude et Fugue en sol mineur (7')", "12, 403, 10", "https://fr.wikipedia.org/wiki/Marcel_Dupr%C3%A9#p-lang-btn"),
-            new Title("COUPERIN.MID", "François Couperin : Tierce en taille (4')", "6, 240, 2", "https://fr.wikipedia.org/wiki/Fran%C3%A7ois_Couperin#p-lang-btn"),
-            new Title("FRANCK.MID", "César Franck : Troisième Choral (10'20)", "13, 622, 20", "https://fr.wikipedia.org/wiki/C%C3%A9sar_Franck#p-lang-btn"),
-            new Title("CHROMORN.MID", "François Couperin : Chromorne en taille (4')", "5, 233, 20", "https://fr.wikipedia.org/wiki/Fran%C3%A7ois_Couperin#p-lang-btn"),
-            new Title("TOCAREM.MID", "J.S. Bach: Toccata en Ré mineur (2'30)", "2, 145, 5", "https://fr.wikipedia.org/wiki/Toccata_et_fugue_en_r%C3%A9_mineur#p-lang-btn"),
-            new Title("LANGLAIS.MID", "Jean Langlais : Chant de Paix (2'30)", "4, 150, 4", "https://fr.wikipedia.org/wiki/Jean_Langlais#p-lang-btn"),
-            new Title("GUILMANT.MID", "Alexandre Guilmant : Noël 'Or dites-nous Marie' (2'20)", "6, 130, 4", "https://fr.wikipedia.org/wiki/Alexandre_Guilmant#p-lang-btn")
+            new Title("LISZT.MID", "Franz Liszt : Prélude et Fugue sur B.A.C.H. (10')", "15, 617, 20", "https://fr.wikipedia.org/wiki/Fantasie_und_Fuge_%C3%BCber_das_Thema_B-A-C-H#p-lang-btn", lml),
+            new Title("MESSIAEN.MID", "Olivier Messiaen : Banquet céleste (6')", "5, 375, 19", "https://en.wikipedia.org/wiki/Le_Banquet_C%C3%A9leste#p-lang-btn", d3m),
+            new Title("ASCENSIO.MID", "Olivier Messiaen : Prière du Christ montant vers son Père (7')", "8, 425, 10", "https://fr.wikipedia.org/wiki/Olivier_Messiaen#p-lang-btn", d3m),
+            new Title("WAGNER.MID", "Richard Wagner : Mort de Isolde, transcription (8'40)", "8, 510, 2", "https://fr.wikipedia.org/wiki/Liebestod#p-lang-btn", lml),
+            new Title("DUPRE.MID", "Marcel Dupré : Prélude et Fugue en sol mineur (7')", "12, 403, 10", "https://fr.wikipedia.org/wiki/Marcel_Dupr%C3%A9#p-lang-btn", lml),
+            new Title("COUPERIN.MID", "François Couperin : Tierce en taille (4')", "6, 240, 2", "https://fr.wikipedia.org/wiki/Fran%C3%A7ois_Couperin#p-lang-btn", d3m),
+            new Title("FRANCK.MID", "César Franck : Troisième Choral (10'20)", "13, 622, 20", "https://fr.wikipedia.org/wiki/C%C3%A9sar_Franck#p-lang-btn", d3m),
+            new Title("CHROMORN.MID", "François Couperin : Chromorne en taille (4')", "5, 233, 20", "https://fr.wikipedia.org/wiki/Fran%C3%A7ois_Couperin#p-lang-btn", d3m),
+            new Title("TOCAREM.MID", "J.S. Bach: Toccata en Ré mineur (2'30)", "2, 145, 5", "https://fr.wikipedia.org/wiki/Toccata_et_fugue_en_r%C3%A9_mineur#p-lang-btn", d3m),
+            new Title("LANGLAIS.MID", "Jean Langlais : Chant de Paix (2'30)", "4, 150, 4", "https://fr.wikipedia.org/wiki/Jean_Langlais#p-lang-btn", d3m),
+            new Title("GUILMANT.MID", "Alexandre Guilmant : Noël 'Or dites-nous Marie' (2'20)", "6, 130, 4", "https://fr.wikipedia.org/wiki/Alexandre_Guilmant#p-lang-btn", d3m)
         };
         private static string CatalogPath="C:/Users/domin/Desktop/Jukebox/";
 
@@ -67,9 +70,13 @@ namespace WebJukebox.Pages
             }
             
         }
-        private void Current()
+        private void Current(bool showCountDown)
         {
             Message = "<h3>Pièce en cours d'audition</h3><p>" + currentTitle.description + "</p>";
+            if (currentTitle.performer != null)
+            {
+                Message += "<h5>Interprétation : "+currentTitle.performer+"</h5>";
+            }
             Message += "<table><tr>";
             Message += "<td align=left><a href=" + stopId + ">Arrêter</a></td>";
             if (Title.IsPlaying())
@@ -83,9 +90,10 @@ namespace WebJukebox.Pages
 
             Message += "<td align=right><a id='refresh' href='/'> Actualiser</a></td>";
             Message += "</tr></table>";
+            if (showCountDown) CountDown();
             if (currentTitle.doc != null)
             {
-                Message += @"<iframe width=100% height=500px src=""" + currentTitle.doc+@""" title=""Wikipedia""></iframe> ";
+                Message += @"<iframe width=100% height=400px src=""" + currentTitle.doc+@""" title=""Wikipedia""></iframe> ";
             }
         }
         private void CountDown() 
@@ -140,8 +148,7 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
                     _logger.LogInformation("onGet invoked with id: {int}", id);
                     currentTitle = playList[(int)id];
                     currentTitle.Start();
-                    Current();            
-                    CountDown();
+                    Current(true);            
                 } else if(id == stopId) { 
                     currentTitle.Cancel();
                     currentTitle = null;
@@ -150,13 +157,12 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
                 else if (id == pauseId)
                 {
                     currentTitle.Pause();
-                    Current();
+                    Current(false);
                 }
                 else if (id == resumeId)
                 {
                     currentTitle.Resume();
-                    Current();
-                    CountDown();
+                    Current(true);
                 }
             }
             else
@@ -167,8 +173,7 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
                 }
                 else
                 {
-                    Current();
-                    if (Title.IsPlaying()) CountDown(); 
+                    Current(Title.IsPlaying());
                 }
             }
         }
@@ -181,12 +186,13 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
         private static bool free = true;
         private static string playlistPath;
 
-        public Title(string aFile, string aDescription, string aTiming, string? aDoc)
+        public Title(string aFile, string aDescription, string aTiming, string? aDoc, string? aPerformer)
         {
             file = aFile;
             description = aDescription;
             timing = aTiming;
             doc = aDoc;
+            performer = aPerformer;
         }
         public static bool IsPlaying() { return _playback != null && _playback.IsRunning; }
         public static bool IsFree() { return free; }
@@ -225,6 +231,7 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
         public string description;
         public string timing;
         public string doc;
+        public string performer;
     };
 
  }
