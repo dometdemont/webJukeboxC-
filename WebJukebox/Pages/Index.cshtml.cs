@@ -6,6 +6,8 @@ using System.Threading;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Multimedia;
 using Melanchall.DryWetMidi.Interaction;
+using Melanchall.DryWetMidi.Common;
+using System.Threading.Channels;
 
 namespace WebJukebox.Pages
 {
@@ -203,7 +205,16 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
             MetricTimeSpan result = (MetricTimeSpan)_playback.GetCurrentTime(TimeSpanType.Metric);
             return result.TotalSeconds;
         }
+        public static void SwellOn()
+        {
+            // Open the swell boxes
+            ControlChangeEvent swellOn = new((SevenBitNumber)11, (SevenBitNumber)100);
+            swellOn.Channel = (FourBitNumber)3; outputDevice.SendEvent(swellOn);
+            swellOn.Channel = (FourBitNumber)2; outputDevice.SendEvent(swellOn);
+        }
+
         public void Start() {
+            SwellOn();
             var midiFile = MidiFile.Read(playlistPath+file);
             _playback = midiFile.GetPlayback(outputDevice);
             _playback.Start();
@@ -212,6 +223,7 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
         }
         private static void OnFinished(object sender, EventArgs e)
         {
+            SwellOn();
             _playback.Dispose();
             outputDevice.Dispose();
             free = true;
@@ -219,6 +231,7 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
         public void Cancel() {
             if (!free)
             {
+                SwellOn();
                 _playback.Stop();
                 outputDevice.Dispose();
                 _playback.Dispose();
