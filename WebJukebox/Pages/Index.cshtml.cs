@@ -49,6 +49,8 @@ namespace WebJukebox.Pages
         private void Welcome()
         {
             Message = "<h3>Liste des pièces disponibles</h3><ul>";
+            string err = Title.getLastError();
+            if (err != null) Message += "<p>Error: "+err+"</p>";
             for (int i = 0; i < playList.Length; i++)
             {
                 Message += "<li><a href=" + i + ">" + playList[i].description + "</a></li>";
@@ -75,6 +77,8 @@ namespace WebJukebox.Pages
         private void Current(bool showCountDown)
         {
             Message = "<h3>Pièce en cours d'audition</h3><p>" + currentTitle.description + "</p>";
+            string err = Title.getLastError();
+            if (err != null) Message += "<p>Error: " + err + "</p>";
             if (currentTitle.performer != null)
             {
                 Message += "<h5>Interprétation : "+currentTitle.performer+"</h5>";
@@ -147,22 +151,25 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
             {
                 if (Title.IsFree() && id < playList.Length)
                 {
-                    _logger.LogInformation("onGet invoked with id: {int}", id);
+                    _logger.LogInformation("Starting playing id: {int}", id);
                     currentTitle = playList[(int)id];
                     currentTitle.Start();
                     Current(true);            
-                } else if(id == stopId) { 
+                } else if(id == stopId) {
+                    _logger.LogInformation("Stopping id: {int}", id);
                     currentTitle.Cancel();
                     currentTitle = null;
                     Welcome();
                 }
                 else if (id == pauseId)
                 {
+                    _logger.LogInformation("Pausing id: {int}", id);
                     currentTitle.Pause();
                     Current(false);
                 }
                 else if (id == resumeId)
                 {
+                    _logger.LogInformation("Resuming id: {int}", id);
                     currentTitle.Resume();
                     Current(true);
                 }
@@ -171,10 +178,12 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
             {
                 if (Title.IsFree())
                 {
+                    _logger.LogInformation("Displaying Welcome");
                     Welcome();
                 }
                 else
                 {
+                    _logger.LogInformation("Displaying current play");
                     Current(Title.IsPlaying());
                 }
             }
@@ -187,6 +196,8 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
         private static OutputDevice outputDevice;
         private static bool free = true;
         private static string playlistPath;
+        private static string lastError;
+        private static Timer heartBeat;
 
         public Title(string aFile, string aDescription, string aTiming, string? aDoc, string? aPerformer)
         {
@@ -196,14 +207,23 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
             doc = aDoc;
             performer = aPerformer;
         }
+        public static string getLastError() { string err = lastError; lastError = null;  return err; }   
         public static bool IsPlaying() { return _playback != null && _playback.IsRunning; }
         public static bool IsFree() { return free; }
-        public static void SetMidiDevice(OutputDevice d) { outputDevice = d; }
+        public static void SetMidiDevice(OutputDevice d) {
+            if (outputDevice != null) outputDevice.Dispose();
+            outputDevice = d; }
         public static void SetCatalogPath(string p) { playlistPath = p; }
         public static double GetElapsed() {
             if (_playback == null) return 0;
             MetricTimeSpan result = (MetricTimeSpan)_playback.GetCurrentTime(TimeSpanType.Metric);
             return result.TotalSeconds;
+        }
+        public static void Heartbeat(object? state)
+        {
+            // Send a void command to keep the device alive: oOpen a fake swell box
+            ControlChangeEvent swellOn = new((SevenBitNumber)11, (SevenBitNumber)100);
+            swellOn.Channel = (FourBitNumber)0; outputDevice.SendEvent(swellOn);
         }
         public static void SwellOn()
         {
@@ -214,26 +234,32 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
         }
 
         public void Start() {
+            if (heartBeat != null) heartBeat.Dispose();
             SwellOn();
             var midiFile = MidiFile.Read(playlistPath+file);
             _playback = midiFile.GetPlayback(outputDevice);
+            _playback.DeviceErrorOccurred += OnError;
             _playback.Start();
             _playback.Finished += OnFinished;
             free = false;
+    }
+        private static void OnError(object sender, EventArgs e)
+        {
+            lastError = e.ToString();
         }
         private static void OnFinished(object sender, EventArgs e)
         {
-            SwellOn();
+            heartBeat = new Timer(Heartbeat, null, 0, 1000); 
             _playback.Dispose();
-            outputDevice.Dispose();
             free = true;
         }
+
+       
         public void Cancel() {
             if (!free)
             {
-                SwellOn();
+                heartBeat = new Timer(Heartbeat, null, 0, 1000);
                 _playback.Stop();
-                outputDevice.Dispose();
                 _playback.Dispose();
             }
             free = true;
@@ -245,6 +271,5 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
         public string timing;
         public string doc;
         public string performer;
-    };
-
+    }
  }
