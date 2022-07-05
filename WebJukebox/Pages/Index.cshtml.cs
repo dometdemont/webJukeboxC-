@@ -18,6 +18,7 @@ namespace WebJukebox.Pages
         private static readonly string d3m = "Dominique Domet de Mont";
         private static readonly string lml = "Louis-Marie Lardic";
         private static Title[] playList = {
+            new Title("EMPTY.MID", "[Cliquez sur Enregistrer pour ajouter une pièce ici...]", "1,5,2", "Auncun enregistrement...", null),
             new Title("LISZT.MID", "Franz Liszt : Prélude et Fugue sur B.A.C.H. (10')", "15, 617, 20", "https://fr.wikipedia.org/wiki/Fantasie_und_Fuge_%C3%BCber_das_Thema_B-A-C-H#p-lang-btn", lml),
             new Title("MESSIAEN.MID", "Olivier Messiaen : Banquet céleste (6')", "5, 375, 19", "https://en.wikipedia.org/wiki/Le_Banquet_C%C3%A9leste#p-lang-btn", d3m),
             new Title("ASCENSIO.MID", "Olivier Messiaen : Prière du Christ montant vers son Père (7')", "8, 425, 10", "https://fr.wikipedia.org/wiki/Olivier_Messiaen#p-lang-btn", d3m),
@@ -25,7 +26,7 @@ namespace WebJukebox.Pages
             new Title("DUPRE.MID", "Marcel Dupré : Prélude et Fugue en sol mineur (7')", "12, 403, 10", "https://fr.wikipedia.org/wiki/Marcel_Dupr%C3%A9#p-lang-btn", lml),
             new Title("COUPERIN.MID", "François Couperin : Tierce en taille (4')", "6, 240, 2", "https://fr.wikipedia.org/wiki/Fran%C3%A7ois_Couperin#p-lang-btn", d3m),
             new Title("FRANCK.MID", "César Franck : Troisième Choral (10'20)", "13, 622, 20", "https://fr.wikipedia.org/wiki/C%C3%A9sar_Franck#p-lang-btn", d3m),
-            new Title("CHROMORN.MID", "François Couperin : Chromorne en taille (4')", "5, 233, 20", "https://fr.wikipedia.org/wiki/Fran%C3%A7ois_Couperin#p-lang-btn", d3m),
+            new Title("CHROMORN.MID", "François Couperin : Chromorne en taille (4')", "5, 233, 2", "https://fr.wikipedia.org/wiki/Fran%C3%A7ois_Couperin#p-lang-btn", d3m),
             new Title("TOCAREM.MID", "J.S. Bach: Toccata en Ré mineur (2'30)", "2, 145, 5", "https://fr.wikipedia.org/wiki/Toccata_et_fugue_en_r%C3%A9_mineur#p-lang-btn", d3m),
             new Title("LANGLAIS.MID", "Jean Langlais : Chant de Paix (2'30)", "4, 150, 4", "https://fr.wikipedia.org/wiki/Jean_Langlais#p-lang-btn", d3m),
             new Title("GUILMANT.MID", "Alexandre Guilmant : Noël 'Or dites-nous Marie' (2'20)", "6, 130, 4", "https://fr.wikipedia.org/wiki/Alexandre_Guilmant#p-lang-btn", d3m)
@@ -35,6 +36,7 @@ namespace WebJukebox.Pages
         private static int stopId = playList.Length;
         private static int pauseId = stopId+1;
         private static int resumeId = pauseId+1;
+        private static int recordId = resumeId + 1;
 
 
         private readonly ILogger<IndexModel> _logger;
@@ -48,9 +50,11 @@ namespace WebJukebox.Pages
 
         private void Welcome()
         {
-            Message = "<h3>Liste des pièces disponibles</h3><ul>";
+            Message = "";
             string err = Title.getLastError();
-            if (err != null) Message += "<p>Error: "+err+"</p>";
+            if (err != null) Message += "<p>Error: " + err + "</p>";
+                        
+            Message += "<h3>Liste des pièces disponibles</h3><ul>";
             for (int i = 0; i < playList.Length; i++)
             {
                 Message += "<li><a href=" + i + ">" + playList[i].description + "</a></li>";
@@ -61,18 +65,39 @@ namespace WebJukebox.Pages
             {
                 OutputDevice lastMidiDevice = OutputDevice.GetByIndex(OutputDevice.GetDevicesCount() - 1);
                 Title.SetMidiDevice(lastMidiDevice);
+                InputDevice lastMidiRecordingDevice=null;
+                if (InputDevice.GetDevicesCount() > 0)
+                {
+                    lastMidiRecordingDevice = InputDevice.GetByIndex(InputDevice.GetDevicesCount() - 1);
+                    Title.SetMidiRecordingDevice(lastMidiRecordingDevice);
+                }
                 Title.SetCatalogPath(CatalogPath);
                 Message += @"<td align=left><ul>";
                 Message += "<li>Périphérique de sortie MIDI : " + lastMidiDevice.Name;
+                if(lastMidiRecordingDevice != null) Message += "<li>Périphérique d'enregistrement MIDI : " + lastMidiRecordingDevice.Name;
                 Message += "<li>Répertoire du catalogue : " + CatalogPath;
                 Message += "</ul></td>";
-                Message += "<td align=right><a href='/'> Actualiser</a></td>";
-                Message += "</tr></table>";
+                Message += "<td align=right><a href='/'> Actualiser</a>";
+                if (lastMidiRecordingDevice != null)
+                {
+                    if(Title.IsFree())Message += "<br><a href=" + recordId + "> Enregistrer</a>";
+                    else Message += "<br><a href=" + stopId + "> Arrêter</a>";
+                }
+                Message += "</td></tr></table>";
             } else
             {
                 Message = "<h3>Aucun périphérique de sortie MIDI détecté/h3>";
             }
             
+        }
+        private void Record()
+        {
+            string recordingState = Title.getRecordingInfo();
+            Message = "<h3>Enregistrement en cours</h3><p>" + recordingState + "</p>";
+            Message += "<table><tr>";
+            Message += "<td align=left><a href=" + stopId + ">Arrêter</a></td>";
+            Message += "<td align=right><a href=" + recordId + "> Actualiser</a></td>";
+            Message += "</tr></table>";
         }
         private void Current(bool showCountDown)
         {
@@ -157,21 +182,34 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
                     Current(true);            
                 } else if(id == stopId) {
                     _logger.LogInformation("Stopping id: {int}", id);
-                    currentTitle.Cancel();
+                    if(currentTitle != null)currentTitle.Cancel();
                     currentTitle = null;
                     Welcome();
                 }
                 else if (id == pauseId)
                 {
                     _logger.LogInformation("Pausing id: {int}", id);
-                    currentTitle.Pause();
+                    if (currentTitle != null)currentTitle.Pause();
                     Current(false);
                 }
                 else if (id == resumeId)
                 {
                     _logger.LogInformation("Resuming id: {int}", id);
-                    currentTitle.Resume();
+                    if (currentTitle != null)currentTitle.Resume();
                     Current(true);
+                }
+                else if(id == recordId)
+                {
+                    if(currentTitle != null)
+                    {
+                        _logger.LogInformation("Displaying current recording");
+                    }
+                    else
+                    {
+                        _logger.LogInformation("Starting recording");
+                        playList[0] = currentTitle = Title.Record();
+                    }
+                    Record();
                 }
             }
             else
@@ -180,6 +218,10 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
                 {
                     _logger.LogInformation("Displaying Welcome");
                     Welcome();
+                }else if (Title.IsRecording())
+                {
+                    _logger.LogInformation("Displaying current record");
+                    Record();
                 }
                 else
                 {
@@ -194,10 +236,19 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
     {
         private static Playback _playback;
         private static OutputDevice outputDevice;
-        private static bool free = true;
+        private static InputDevice inputDevice;
+        enum State
+        {
+            idle,
+            playing,
+            recording
+        } 
+        private static State state=State.idle;
         private static string playlistPath;
         private static string lastError;
         private static Timer heartBeat;
+        private static Recording recording;
+        private static MetricTimeSpan firstRecordedNoteTime, lastRecordedNoteTime;
 
         public Title(string aFile, string aDescription, string aTiming, string? aDoc, string? aPerformer)
         {
@@ -209,10 +260,19 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
         }
         public static string getLastError() { string err = lastError; lastError = null;  return err; }   
         public static bool IsPlaying() { return _playback != null && _playback.IsRunning; }
-        public static bool IsFree() { return free; }
-        public static void SetMidiDevice(OutputDevice d) {
+        public static bool IsFree() { return state == State.idle; }
+        public static bool IsRecording() { return state == State.recording; }
+        public static void SetMidiDevice(OutputDevice d)
+        {
             if (outputDevice != null) outputDevice.Dispose();
-            outputDevice = d; }
+            outputDevice = d;
+        }
+        public static void SetMidiRecordingDevice(InputDevice d)
+        {
+            if (inputDevice != null) inputDevice.Dispose();
+           inputDevice = d;
+           inputDevice.EventReceived += OnEventReceived;
+        }
         public static void SetCatalogPath(string p) { playlistPath = p; }
         public static double GetElapsed() {
             if (_playback == null) return 0;
@@ -221,7 +281,7 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
         }
         public static void Heartbeat(object? state)
         {
-            // Send a void command to keep the device alive: oOpen a fake swell box
+            // Send a void command to keep the device alive: open a fake swell box
             ControlChangeEvent swellOn = new((SevenBitNumber)11, (SevenBitNumber)100);
             swellOn.Channel = (FourBitNumber)0; outputDevice.SendEvent(swellOn);
         }
@@ -232,7 +292,46 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
             swellOn.Channel = (FourBitNumber)3; outputDevice.SendEvent(swellOn);
             swellOn.Channel = (FourBitNumber)2; outputDevice.SendEvent(swellOn);
         }
-
+        public static Title Record()
+        {
+            firstRecordedNoteTime = null;
+            lastRecordedNoteTime = null;
+            recording = new Recording(TempoMap.Default, inputDevice);
+            inputDevice.StartEventsListening();
+            recording.Start();
+            state = State.recording;
+            return new Title(
+                "Recorded" + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".mid", 
+                "Enregistrement " + DateTime.Now.ToString(), 
+                "1,2,1", null, null);
+        }
+        public  static String getRecordingInfo()
+        {
+            if(recording == null) return null;
+            String firstNote = "Aucune note reçue";
+            String lastNote = "Aucune note terminée";
+            if(firstRecordedNoteTime != null)
+            {
+                firstNote = "1ère note : " + firstRecordedNoteTime.TotalSeconds;
+            }
+            if (lastRecordedNoteTime != null)
+            {
+                lastNote = "Dernière note : " + lastRecordedNoteTime.TotalSeconds;
+            }
+            return "<p>IsRunning: "+recording.IsRunning+"</p><p>IsListening: "+inputDevice.IsListeningForEvents+
+                "</p><p>Durée: " +recording.GetDuration(TimeSpanType.Metric).ToString()+
+                "</p><p>" + firstNote+"</p>"+
+                "</p><p>" + lastNote + "</p>";
+        }
+        private static void OnEventReceived(object sender, MidiEventReceivedEventArgs e)
+        {
+            var midiDevice = (MidiDevice)sender;
+            if (e.Event.EventType == MidiEventType.NoteOn)
+            {
+                if(firstRecordedNoteTime == null)firstRecordedNoteTime = (MetricTimeSpan)recording.GetDuration(TimeSpanType.Metric);
+                lastRecordedNoteTime = (MetricTimeSpan)recording.GetDuration(TimeSpanType.Metric);
+            }
+        }
         public void Start() {
             if (heartBeat != null) heartBeat.Dispose();
             SwellOn();
@@ -241,7 +340,7 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
             _playback.DeviceErrorOccurred += OnError;
             _playback.Start();
             _playback.Finished += OnFinished;
-            free = false;
+            state = State.playing;
     }
         private static void OnError(object sender, EventArgs e)
         {
@@ -251,18 +350,34 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
         {
             heartBeat = new Timer(Heartbeat, null, 0, 1000); 
             _playback.Dispose();
-            free = true;
+            state = State.idle;
         }
 
        
         public void Cancel() {
-            if (!free)
+            switch (state)
             {
-                heartBeat = new Timer(Heartbeat, null, 0, 1000);
-                _playback.Stop();
-                _playback.Dispose();
+                case State.playing:
+                    heartBeat = new Timer(Heartbeat, null, 0, 1000);
+                    _playback.Stop();
+                    _playback.Dispose();
+                    break;
+                case State.recording:
+                    MetricTimeSpan end = (MetricTimeSpan)recording.GetDuration(TimeSpanType.Metric);
+                    if(firstRecordedNoteTime!=null && lastRecordedNoteTime!=null)timing = 
+                        (int)firstRecordedNoteTime.TotalSeconds + 
+                        "," + (int)(lastRecordedNoteTime.TotalSeconds - firstRecordedNoteTime.TotalSeconds ) +
+                        "," + (int)(end.TotalSeconds - lastRecordedNoteTime.TotalSeconds);
+                    description += " ("+end.Minutes+"'"+end.Seconds+")";
+                    recording.Stop();
+                    var recordedFile = recording.ToFile();
+                    recording.Dispose();
+                    recordedFile.Write(playlistPath+file);
+                    recording = null;
+                    Console.Out.WriteLine(timing);
+                    break;
             }
-            free = true;
+            state = State.idle;
         }
         public void Pause() { _playback.Stop(); }
         public void Resume() { _playback.Start(); }
