@@ -15,10 +15,18 @@ namespace WebJukebox.Pages
     {
         // Message receives the dynamic html code
         public string Message { get; private set; } = "PageModel in C#";
+        
+        // Shortcuts for known performers
         private static readonly string d3m = "Dominique Domet de Mont";
         private static readonly string lml = "Louis-Marie Lardic";
+        
+        // The static playlist
         private static Title[] playList = {
-            new Title("EMPTY.MID", "[Cliquez sur Enregistrer pour ajouter une pièce ici...]", "1,5,2", "Auncun enregistrement...", null),
+            // The first item is reserved for live recording: file and timing will be updated when record is complete.
+            // Since the file name is using the recording date & time, subsequent recordings do not override previous ones, even if the playlist shows only the latest
+            new Title("EMPTY.MID", "[Cliquez sur Enregistrer pour ajouter une pièce ici...]", "1,5,2", null, null),
+            
+            // Other items are known and documented
             new Title("LISZT.MID", "Franz Liszt : Prélude et Fugue sur B.A.C.H. (10')", "15, 617, 20", "https://fr.wikipedia.org/wiki/Fantasie_und_Fuge_%C3%BCber_das_Thema_B-A-C-H#p-lang-btn", lml),
             new Title("MESSIAEN.MID", "Olivier Messiaen : Banquet céleste (6')", "5, 375, 19", "https://en.wikipedia.org/wiki/Le_Banquet_C%C3%A9leste#p-lang-btn", d3m),
             new Title("ASCENSIO.MID", "Olivier Messiaen : Prière du Christ montant vers son Père (7')", "8, 425, 10", "https://fr.wikipedia.org/wiki/Olivier_Messiaen#p-lang-btn", d3m),
@@ -31,23 +39,29 @@ namespace WebJukebox.Pages
             new Title("LANGLAIS.MID", "Jean Langlais : Chant de Paix (2'30)", "4, 150, 4", "https://fr.wikipedia.org/wiki/Jean_Langlais#p-lang-btn", d3m),
             new Title("GUILMANT.MID", "Alexandre Guilmant : Noël 'Or dites-nous Marie' (2'20)", "6, 130, 4", "https://fr.wikipedia.org/wiki/Alexandre_Guilmant#p-lang-btn", d3m)
         };
+        
+        // MIDI files location on the server, also used to store new recordings
         private static string CatalogPath="C:/Users/domin/Desktop/Jukebox/";
 
+        // List of ids accepted on GET requests: 
+        // - 0..N-1: the title to play
+        // - N... commands stop, pause, resume, record
         private static int stopId = playList.Length;
         private static int pauseId = stopId+1;
         private static int resumeId = pauseId+1;
         private static int recordId = resumeId + 1;
 
-
-        private readonly ILogger<IndexModel> _logger;
-
         private static Title? currentTitle =null;
 
+        private readonly ILogger<IndexModel> _logger;
         public IndexModel(ILogger<IndexModel> logger)
         {
             _logger = logger;
         }
 
+        // Build the welcome page: 
+        // Display the last error if any, the list of titles available for playing, the MIDI devices in/out
+        // Two actions: Refresh and Record
         private void Welcome()
         {
             Message = "";
@@ -90,6 +104,10 @@ namespace WebJukebox.Pages
             }
             
         }
+        
+        // Build the Record page
+        // Display the recording status
+        // Two actions: Refresh and Stop
         private void Record()
         {
             string recordingState = Title.getRecordingInfo();
@@ -99,6 +117,10 @@ namespace WebJukebox.Pages
             Message += "<td align=right><a href=" + recordId + "> Actualiser</a></td>";
             Message += "</tr></table>";
         }
+        
+        // Build the Current page
+        // Display the current play, with an optional count down (typically while playing, not paused)
+        // Three actions: Stop/Pause-Resume/Refresh
         private void Current(bool showCountDown)
         {
             Message = "<h3>Pièce en cours d'audition</h3><p>" + currentTitle.description + "</p>";
@@ -127,6 +149,14 @@ namespace WebJukebox.Pages
                 Message += @"<iframe width=100% height=400px src=""" + currentTitle.doc+@""" title=""Wikipedia""></iframe> ";
             }
         }
+        
+        // The cound down display 
+        // This is a javascript fragment receiving dynamically a 'distances' variable providing the play timing as a table of 4 durations expressed in seconds:
+        // - load: delay before the first note is played
+        // - perform: the actual play duration
+        // - unload: delay after the last note is played
+        // - current: the current position in the play
+        // The javascript countDown function will refresh the HTML variable with id countDown at 'rate' period with the current phase and the remaining time in this phase
         private void CountDown() 
         { 
             Message += @"<p id=""countDown""></p>
@@ -170,6 +200,11 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
 ";
         }
 
+        // The GET request processing
+        // List of ids accepted: 
+        // - 0..N-1: the title to play
+        // - N... commands stop, pause, resume, record
+        // Store the new recording in the first element of the playlist (while not erasing previous recorded files)
         public void OnGet(int? id)
         {
             if (id != null)
@@ -207,6 +242,7 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
                     else
                     {
                         _logger.LogInformation("Starting recording");
+                        // Store the new recording in the first element of the playlist
                         playList[0] = currentTitle = Title.Record();
                     }
                     Record();
@@ -232,6 +268,7 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
         }
     }
 
+    // The implementation of a title to play / record
     class Title
     {
         private static Playback _playback;
@@ -292,6 +329,9 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
             swellOn.Channel = (FourBitNumber)3; outputDevice.SendEvent(swellOn);
             swellOn.Channel = (FourBitNumber)2; outputDevice.SendEvent(swellOn);
         }
+        
+        // Start a new recording on the input device
+        // Name the file using the current date and time to make it unique
         public static Title Record()
         {
             firstRecordedNoteTime = null;
@@ -323,6 +363,8 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
                 "</p><p>" + firstNote+"</p>"+
                 "</p><p>" + lastNote + "</p>";
         }
+        
+        // Record specific events timing: first note, last note
         private static void OnEventReceived(object sender, MidiEventReceivedEventArgs e)
         {
             var midiDevice = (MidiDevice)sender;
@@ -332,6 +374,8 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
                 lastRecordedNoteTime = (MetricTimeSpan)recording.GetDuration(TimeSpanType.Metric);
             }
         }
+        
+        // Start a playback
         public void Start() {
             if (heartBeat != null) heartBeat.Dispose();
             SwellOn();
@@ -353,7 +397,8 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
             state = State.idle;
         }
 
-       
+        // Stop the current action
+        // In recording case, save the file and update the timing
         public void Cancel() {
             switch (state)
             {
