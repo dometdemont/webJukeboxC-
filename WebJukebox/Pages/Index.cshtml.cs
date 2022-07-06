@@ -37,7 +37,9 @@ namespace WebJukebox.Pages
             new Title("CHROMORN.MID", "François Couperin : Chromorne en taille (4')", "5, 233, 2", "https://fr.wikipedia.org/wiki/Fran%C3%A7ois_Couperin#p-lang-btn", d3m),
             new Title("TOCAREM.MID", "J.S. Bach: Toccata en Ré mineur (2'30)", "2, 145, 5", "https://fr.wikipedia.org/wiki/Toccata_et_fugue_en_r%C3%A9_mineur#p-lang-btn", d3m),
             new Title("LANGLAIS.MID", "Jean Langlais : Chant de Paix (2'30)", "4, 150, 4", "https://fr.wikipedia.org/wiki/Jean_Langlais#p-lang-btn", d3m),
-            new Title("GUILMANT.MID", "Alexandre Guilmant : Noël 'Or dites-nous Marie' (2'20)", "6, 130, 4", "https://fr.wikipedia.org/wiki/Alexandre_Guilmant#p-lang-btn", d3m)
+            new Title("GUILMANT.MID", "Alexandre Guilmant : Noël 'Or dites-nous Marie' (2'20)", "6, 130, 4", "https://fr.wikipedia.org/wiki/Alexandre_Guilmant#p-lang-btn", d3m),
+            new Title("DISPUTE.MID", "Yann Tiersen : La Dispute - imitation musette (2'20)", "4, 133, 2", "https://fr.wikipedia.org/wiki/Le_Fabuleux_Destin_d%27Am%C3%A9lie_Poulain_(bande_originale)#p-lang-btn", d3m),
+            new Title("HIMMEL.MID", "JS Bach : Nun schleuss den Himmel auf (2'10)", "5, 125, 2", "https://fr.wikipedia.org/wiki/Orgelb%C3%BCchlein#p-lang-btn", d3m)
         };
         
         // MIDI files location on the server, also used to store new recordings
