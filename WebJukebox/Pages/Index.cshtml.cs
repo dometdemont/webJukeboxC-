@@ -69,15 +69,9 @@ namespace WebJukebox.Pages
             Message = "";
             string err = Title.getLastError();
             if (err != null) Message += "<p>Error: " + err + "</p>";
-                        
-            Message += "<h3>Liste des pièces disponibles</h3><ul>";
-            for (int i = 0; i < playList.Length; i++)
-            {
-                Message += "<li><a href=" + i + ">" + playList[i].description + "</a></li>";
-            };
-            Message += "</ul>";
-            Message += "<table><tr>";
-            if(OutputDevice.GetDevicesCount() > 0)
+            currentTitle = null;
+
+            if (OutputDevice.GetDevicesCount() > 0)
             {
                 OutputDevice lastMidiDevice = OutputDevice.GetByIndex(OutputDevice.GetDevicesCount() - 1);
                 Title.SetMidiDevice(lastMidiDevice);
@@ -88,19 +82,24 @@ namespace WebJukebox.Pages
                     Title.SetMidiRecordingDevice(lastMidiRecordingDevice);
                 }
                 Title.SetCatalogPath(CatalogPath);
-                Message += @"<td align=left><ul>";
-                Message += "<li>Périphérique de sortie MIDI : " + lastMidiDevice.Name;
-                if(lastMidiRecordingDevice != null) Message += "<li>Périphérique d'enregistrement MIDI : " + lastMidiRecordingDevice.Name;
-                Message += "<li>Répertoire du catalogue : " + CatalogPath;
-                Message += "</ul></td>";
-                Message += "<td align=right><a href='/'> Actualiser</a>";
+                Message += "<ul><li>Périphérique de sortie MIDI : " + lastMidiDevice.Name+ "</li>";
+                if(lastMidiRecordingDevice != null) Message += "<li>Périphérique d'enregistrement MIDI : " + lastMidiRecordingDevice.Name + "</li>";
+                Message += "<li>Répertoire du catalogue : " + CatalogPath + "</li></ul>";
+                Message += "<table><tr><td align=left>";
                 if (lastMidiRecordingDevice != null)
                 {
-                    if(Title.IsFree())Message += "<br><a href=" + recordId + "> Enregistrer</a>";
-                    else Message += "<br><a href=" + stopId + "> Arrêter</a>";
+                    if(Title.IsFree())Message += "<a href=" + recordId + "> Enregistrer</a>";
                 }
-                Message += "</td></tr></table>";
-            } else
+                Message += "</td><td align=right><a href='/'> Actualiser</a></tr></table>";
+
+                Message += "<h3>Liste des pièces disponibles</h3><ul>";
+                for (int i = 0; i < playList.Length; i++)
+                {
+                    Message += "<li><a href=" + i + ">" + playList[i].description + "</a></li>";
+                };
+                Message += "</ul>";
+            }
+            else
             {
                 Message = "<h3>Aucun périphérique de sortie MIDI détecté/h3>";
             }
@@ -220,7 +219,6 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
                 } else if(id == stopId) {
                     _logger.LogInformation("Stopping id: {int}", id);
                     if(currentTitle != null)currentTitle.Cancel();
-                    currentTitle = null;
                     Welcome();
                 }
                 else if (id == pauseId)
