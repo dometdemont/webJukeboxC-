@@ -124,6 +124,8 @@ namespace WebJukebox.Pages
         // Three actions: Stop/Pause-Resume/Refresh
         private void Current(bool showCountDown)
         {
+            if(currentTitle == null) { Welcome(); return; }
+
             Message = "<h3>Pièce en cours d'audition</h3><p>" + currentTitle.description + "</p>";
             string err = Title.getLastError();
             if (err != null) Message += "<p>Error: " + err + "</p>";
@@ -235,17 +237,24 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
                 }
                 else if(id == recordId)
                 {
-                    if(currentTitle != null)
+                    if (Title.IsFree())
                     {
-                        _logger.LogInformation("Displaying current recording");
-                    }
-                    else
-                    {
-                        _logger.LogInformation("Starting recording");
+                        _logger.LogInformation("Starting new recording");
                         // Store the new recording in the first element of the playlist
                         playList[0] = currentTitle = Title.Record();
+                        Record();
                     }
-                    Record();
+                    else if (Title.IsRecording())
+                    {
+                        _logger.LogInformation("Displaying current recording");
+                        Record();
+                    }
+                    else if (Title.IsPlaying())
+                    {
+                        _logger.LogInformation("Displaying current play");
+                        Current(Title.IsPlaying());
+                    }
+                    else Welcome();
                 }
             }
             else
@@ -318,9 +327,12 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
         }
         public static void Heartbeat(object? state)
         {
-            // Send a void command to keep the device alive: open a fake swell box
-            ControlChangeEvent swellOn = new((SevenBitNumber)11, (SevenBitNumber)100);
-            swellOn.Channel = (FourBitNumber)0; outputDevice.SendEvent(swellOn);
+            try
+            {
+                // Send a void command to keep the device alive: open a fake swell box
+                ControlChangeEvent swellOn = new((SevenBitNumber)11, (SevenBitNumber)100);
+                swellOn.Channel = (FourBitNumber)0; outputDevice.SendEvent(swellOn);
+            }catch(Exception e) { Console.Out.WriteLine("Cannot send heartbeat: "+e.Message); };
         }
         public static void SwellOn()
         {
@@ -392,7 +404,7 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
         }
         private static void OnFinished(object sender, EventArgs e)
         {
-            heartBeat = new Timer(Heartbeat, null, 0, 1000); 
+            heartBeat = new Timer(Heartbeat, null, 10000, 1000); 
             _playback.Dispose();
             state = State.idle;
         }
@@ -403,7 +415,7 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
             switch (state)
             {
                 case State.playing:
-                    heartBeat = new Timer(Heartbeat, null, 0, 1000);
+                    heartBeat = new Timer(Heartbeat, null, 10000, 1000);
                     _playback.Stop();
                     _playback.Dispose();
                     break;
