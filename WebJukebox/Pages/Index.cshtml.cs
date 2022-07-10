@@ -212,12 +212,20 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
         {
             if (id != null)
             {
-                if (Title.IsFree() && id < playList.Length)
+                if (id < playList.Length)
                 {
-                    _logger.LogInformation("Starting playing id: {int}", id);
-                    currentTitle = playList[(int)id];
-                    currentTitle.Start();
-                    Current(true);            
+                    if (Title.IsFree())
+                    {
+                        _logger.LogInformation("Starting playing id: {int}", id);
+                        currentTitle = playList[(int)id];
+                        currentTitle.Start();
+                        Current(true);
+                    }
+                    else
+                    {
+                        Current(Title.IsPlaying());
+                    }
+                    
                 } else if(id == stopId) {
                     _logger.LogInformation("Stopping id: {int}", id);
                     if(currentTitle != null)currentTitle.Cancel();
