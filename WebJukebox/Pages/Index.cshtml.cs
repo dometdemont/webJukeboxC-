@@ -33,13 +33,16 @@ namespace WebJukebox.Pages
             new Title("WAGNER.MID", "Richard Wagner : Mort de Isolde, transcription (8'40)", "8, 510, 2", "https://fr.wikipedia.org/wiki/Liebestod#p-lang-btn", lml),
             new Title("DUPRE.MID", "Marcel Dupré : Prélude et Fugue en sol mineur (7')", "12, 403, 10", "https://fr.wikipedia.org/wiki/Marcel_Dupr%C3%A9#p-lang-btn", lml),
             new Title("COUPERIN.MID", "François Couperin : Tierce en taille (4')", "6, 240, 2", "https://fr.wikipedia.org/wiki/Fran%C3%A7ois_Couperin#p-lang-btn", d3m),
+            new Title("OBOE.MID", "Alessandro Marcello / JS Bach : Concerto en Ré mineur (4'40)", "4, 276, 2", "https://fr.wikipedia.org/wiki/Concerto_pour_hautbois_en_r%C3%A9_mineur_de_Marcello#p-lang-btn", d3m),
             new Title("FRANCK.MID", "César Franck : Troisième Choral (10'20)", "13, 622, 20", "https://fr.wikipedia.org/wiki/C%C3%A9sar_Franck#p-lang-btn", d3m),
             new Title("CHROMORN.MID", "François Couperin : Chromorne en taille (4')", "5, 233, 2", "https://fr.wikipedia.org/wiki/Fran%C3%A7ois_Couperin#p-lang-btn", d3m),
-            new Title("TOCAREM.MID", "J.S. Bach: Toccata en Ré mineur (2'30)", "2, 145, 5", "https://fr.wikipedia.org/wiki/Toccata_et_fugue_en_r%C3%A9_mineur#p-lang-btn", d3m),
+            new Title("TOCAREM.MID", "J.S. Bach : Toccata en Ré mineur (2'30)", "2, 145, 5", "https://fr.wikipedia.org/wiki/Toccata_et_fugue_en_r%C3%A9_mineur#p-lang-btn", d3m),
+            new Title("BUXTEHUD.MID", "Dietrich Buxtehude : Passacaille en Ré mineur (7')", "5, 420, 5", "https://fr.wikipedia.org/wiki/Passacaille_en_r%C3%A9_mineur_de_Buxtehude#p-lang-btn", d3m),
             new Title("LANGLAIS.MID", "Jean Langlais : Chant de Paix (2'30)", "4, 150, 4", "https://fr.wikipedia.org/wiki/Jean_Langlais#p-lang-btn", d3m),
             new Title("GUILMANT.MID", "Alexandre Guilmant : Noël 'Or dites-nous Marie' (2'20)", "6, 130, 4", "https://fr.wikipedia.org/wiki/Alexandre_Guilmant#p-lang-btn", d3m),
             new Title("DISPUTE.MID", "Yann Tiersen : La Dispute - imitation musette (2'20)", "4, 133, 2", "https://fr.wikipedia.org/wiki/Le_Fabuleux_Destin_d%27Am%C3%A9lie_Poulain_(bande_originale)#p-lang-btn", d3m),
-            new Title("HIMMEL.MID", "JS Bach : Nun schleuss den Himmel auf (2'10)", "5, 125, 2", "https://fr.wikipedia.org/wiki/Orgelb%C3%BCchlein#p-lang-btn", d3m)
+            new Title("HIMMEL.MID", "JS Bach : Nun schleuss den Himmel auf (2'10)", "5, 125, 2", "https://fr.wikipedia.org/wiki/Orgelb%C3%BCchlein#p-lang-btn", d3m),
+            new Title("TODESBAND.MID", "JS Bach : Christ lag in Todesbanden (1'30)", "2, 90, 2", "https://fr.wikipedia.org/wiki/Orgelb%C3%BCchlein#p-lang-btn", d3m)
         };
         
         // MIDI files location on the server, also used to store new recordings
@@ -103,6 +106,7 @@ namespace WebJukebox.Pages
             {
                 Message = "<h3>Aucun périphérique de sortie MIDI détecté/h3>";
             }
+            Message += "<h6>&copy 2022 Orgue et Musique Sacrée à la Basilique St Joseph de Grenoble</h6>";
             
         }
         
@@ -208,6 +212,7 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
         // - 0..N-1: the title to play
         // - N... commands stop, pause, resume, record
         // Store the new recording in the first element of the playlist (while not erasing previous recorded files)
+
         public void OnGet(int? id)
         {
             if (id != null)
@@ -216,8 +221,8 @@ setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+
                 {
                     if (Title.IsFree())
                     {
-                        _logger.LogInformation("Starting playing id: {int}", id);
                         currentTitle = playList[(int)id];
+                        _logger.LogInformation("Starting playing id: {int}: {string}", id, currentTitle.description);
                         currentTitle.Start();
                         Current(true);
                     }
