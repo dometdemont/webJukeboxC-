@@ -22,4 +22,7 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 
-app.Run();
+try { app.Run(); } catch(Exception ex) { 
+    Console.Out.WriteLine("Cannot run : " + ex.Message); 
+    Console.In.ReadLine();
+}
