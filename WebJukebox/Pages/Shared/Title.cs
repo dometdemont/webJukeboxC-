@@ -46,6 +46,28 @@ namespace WebJukebox.Pages.Shared
             lastForwardedExpressionPositif, lastForwardedExpressionSwell,
             activeForwardedNotes, totalForwardedNotes;
 
+        // Registration description for each program on # 19
+        private static string[] registration19 =
+        {
+            "(Rien)",
+            "Bourdon 8",
+            "Montre 8",
+            "Fonds 8",
+            "Fonds 8, 4",
+            "Fonds 8, 4, 2",
+            "Fonds 8 GO Solo baryton",
+            "Voix céleste",
+            "Clarinette",
+            "Bourdon Solo cornet Récit",
+            "Bourdon Solo clarinette Récit",
+            "Basson 16 en solo sur Fonds 8 GO",
+            "Quintaton 16",
+            "Cornet",
+            "Trompette Clairon",
+            "Tutti",
+            "Imitation musette: Voix céleste, clarinette, Quintaton, Flûte creuse"
+        };
+
         public Title(string aFile, string aDescription, string aTiming, string? aPerformer, int aSpeed, string? aDoc)
         {
             // The MIDI file to playback
@@ -161,7 +183,10 @@ namespace WebJukebox.Pages.Shared
 
         public static String getForwardedInfo()
         {
+            String stopsOn19 = "?";
+            if(lastForwardedProgramChange < registration19.Length)stopsOn19=registration19[lastForwardedProgramChange];
             return "<table><tr><td>Combinaison</td><td>" + lastForwardedProgramChange +
+                "</td></tr><tr><td>Jeux : "+ stopsOn19 +
                 "</td></tr><tr><td>Expression Récit</td><td>" + lastForwardedExpressionSwell +
                 "</td></tr><tr><td>Expression Positif</td><td>" + lastForwardedExpressionPositif +
                 "</td></tr><tr><td>Nombre de notes actives</td><td>" + activeForwardedNotes +
@@ -198,7 +223,6 @@ namespace WebJukebox.Pages.Shared
         }
         private static MidiEvent OnForwardEventReceived(MidiEvent e)
         {
-            //Console.Out.WriteLine(e.ToString());
             MidiEvent result = null;
             switch (e.EventType)
             {
@@ -208,7 +232,6 @@ namespace WebJukebox.Pages.Shared
                     if (result == null)
                     // Normal notes forced to Great keyboard channel 
                     {
-                        Console.Out.WriteLine("Forwarded note on " + on.NoteNumber + " velocity " + on.Velocity + " from channel " + on.Channel);
                         on.Channel = getPipeOrganChannel(PipeOrganChannel.Great);
                         result = on;
                         // Note on with null velocity has to be considered as note off as per the MIDI spec
@@ -222,7 +245,6 @@ namespace WebJukebox.Pages.Shared
                     if (result == null)
                     // Normal notes forced to Great keyboard channel 
                     {
-                        Console.Out.WriteLine("Forwarded note off " + off.NoteNumber + " velocity " + off.Velocity + " from channel " + off.Channel);
                         off.Channel = getPipeOrganChannel(PipeOrganChannel.Great);
                         result = off;
                         activeForwardedNotes--;
