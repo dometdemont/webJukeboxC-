@@ -25,7 +25,7 @@ namespace WebJukebox.Pages
         private static Title[] playList = {
             // The first item is reserved for live recording: file and timing will be updated when record is complete.
             // Since the file name is using the recording date & time, subsequent recordings do not override previous ones, even if the playlist shows only the latest
-            new Title("EMPTY.MID", "[Cliquez sur Enregistrer pour ajouter une pièce ici...]", "1,5,2", null, 100, null),
+            new Title("EMPTY.MID", "", "1,5,2", null, 100, null),
             
             // Other items are known and documented
             new Title("LISZT.MID", "Franz Liszt : Prélude et Fugue sur B.A.C.H. (10')", "15, 617, 20", lml, 100, "https://fr.wikipedia.org/wiki/Fantasie_und_Fuge_%C3%BCber_das_Thema_B-A-C-H#p-lang-btn"),
