@@ -5,6 +5,20 @@ using Melanchall.DryWetMidi.Common;
 
 namespace WebJukebox.Pages.Shared
 {
+    // The implementation of a score recorded as a video
+    class Score
+    {
+        public string? video;
+        public int speed;
+        public int offset;
+
+        public Score(string? video, int speed, int offset)
+        {
+            this.video = video;
+            this.speed = speed;
+            this.offset = offset;
+        }
+    }
     // The implementation of a title to play / record / forward
     class Title
     {
@@ -68,7 +82,7 @@ namespace WebJukebox.Pages.Shared
             "Imitation musette: Voix céleste, clarinette, Quintaton, Flûte creuse"
         };
 
-        public Title(string aFile, string aDescription, string aTiming, string? aPerformer, int aSpeed, string? aDoc)
+        public Title(string aFile, string aDescription, string aTiming, string? aPerformer, int aSpeed, string? aDoc, Score? aScore)
         {
             // The MIDI file to playback
             file = aFile;
@@ -78,6 +92,8 @@ namespace WebJukebox.Pages.Shared
             timing = aTiming;
             // Optional URL displayed during the play
             doc = aDoc;
+            // Optional URL displaying the score
+            score = aScore;
             // String displayed as the MIDI recording performer
             performer = aPerformer;
             // Playback speed in %, ie 100=normal speed, 50 half speed, etc.
@@ -144,7 +160,7 @@ namespace WebJukebox.Pages.Shared
             return new Title(
                 "EMPTY.MID",
                 "Forwarded " + DateTime.Now.ToString(),
-                "1,2,1", null, 100, null);
+                "1,2,1", null, 100, null, null);
         }
         // Start a new recording on the input device
         // Name the file using the current date and time to make it unique
@@ -160,7 +176,7 @@ namespace WebJukebox.Pages.Shared
             return new Title(
                 "Recorded" + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".mid",
                 "Enregistrement " + DateTime.Now.ToString(),
-                "1,2,1", null, 100, null);
+                "1,2,1", null, 100, null, null);
         }
         public static String getRecordingInfo()
         {
@@ -362,6 +378,7 @@ namespace WebJukebox.Pages.Shared
         public string description;
         public string timing;
         public string doc;
+        public Score score;
         public string performer;
         public int speed;
     }

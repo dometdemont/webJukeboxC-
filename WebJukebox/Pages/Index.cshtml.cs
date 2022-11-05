@@ -20,35 +20,39 @@ namespace WebJukebox.Pages
         // Shortcuts for known performers
         private static readonly string d3m = "Dominique Domet de Mont";
         private static readonly string lml = "Louis-Marie Lardic";
-        
+
+        // Famous scores
+        static Score BACH = new Score("https://orguestjo.go.yj.fr/TestJukebox/datas/medias/MP4/1100000 - BACHLISZT.mp4", 91, 0);
+
         // The static playlist
         private static Title[] playList = {
             // The first item is reserved for live recording: file and timing will be updated when record is complete.
             // Since the file name is using the recording date & time, subsequent recordings do not override previous ones, even if the playlist shows only the latest
-            new Title("EMPTY.MID", "", "1,5,2", null, 100, null),
+            new Title("EMPTY.MID", "", "1,5,2", null, 100, null, null),
             
             // Other items are known and documented
-            new Title("LISZT.MID", "Franz Liszt : Prélude et Fugue sur B.A.C.H. (10')", "15, 617, 20", lml, 100, "https://fr.wikipedia.org/wiki/Fantasie_und_Fuge_%C3%BCber_das_Thema_B-A-C-H#p-lang-btn"),
-            new Title("WAGNER.MID", "Richard Wagner : Mort de Isolde, transcription (8'40)", "8, 510, 2", lml, 100, "https://fr.wikipedia.org/wiki/Liebestod#p-lang-btn"),
-            new Title("DUPRE.MID", "Marcel Dupré : Prélude et Fugue en sol mineur (7')", "12, 403, 10", lml, 100, "https://fr.wikipedia.org/wiki/Marcel_Dupr%C3%A9#p-lang-btn"),
-            new Title("FRANCK.MID", "César Franck : Troisième Choral (10'20)", "13, 622, 20", lml, 100, "https://fr.wikipedia.org/wiki/C%C3%A9sar_Franck#p-lang-btn"),
-            
-            new Title("MESSIAEN.MID", "Olivier Messiaen : Banquet céleste (6')", "5, 375, 19", d3m, 100, "https://en.wikipedia.org/wiki/Le_Banquet_C%C3%A9leste#p-lang-btn"),
-            new Title("ASCENSIO.MID", "Olivier Messiaen : Prière du Christ montant vers son Père (7')", "8, 425, 10", d3m, 100, "https://fr.wikipedia.org/wiki/Olivier_Messiaen#p-lang-btn"),
-            new Title("COUPERIN.MID", "François Couperin : Tierce en taille (4')", "6, 240, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Fran%C3%A7ois_Couperin#p-lang-btn"),
-            new Title("OBOE.MID", "Alessandro Marcello / JS Bach : Concerto en Ré mineur (4'40)", "4, 276, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Concerto_pour_hautbois_en_r%C3%A9_mineur_de_Marcello#p-lang-btn"),
-            new Title("CHROMORN.MID", "François Couperin : Chromorne en taille (4')", "5, 233, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Fran%C3%A7ois_Couperin#p-lang-btn"),
-            new Title("TOCAREM.MID", "J.S. Bach : Toccata en Ré mineur (2'30)", "2, 145, 5", d3m, 100, "https://fr.wikipedia.org/wiki/Toccata_et_fugue_en_r%C3%A9_mineur#p-lang-btn"),
-            new Title("BUXTEHUD.MID", "Dietrich Buxtehude : Passacaille en Ré mineur (7')", "5, 420, 5", d3m, 100, "https://fr.wikipedia.org/wiki/Passacaille_en_r%C3%A9_mineur_de_Buxtehude#p-lang-btn"),
-            new Title("LANGLAIS.MID", "Jean Langlais : Chant de Paix (2'30)", "4, 150, 4", d3m, 100, "https://fr.wikipedia.org/wiki/Jean_Langlais#p-lang-btn"),
-            new Title("GUILMANT.MID", "Alexandre Guilmant : Noël 'Or dites-nous Marie' (2'20)", "6, 130, 4", d3m, 100, "https://fr.wikipedia.org/wiki/Alexandre_Guilmant#p-lang-btn"),
-            new Title("DISPUTE.MID", "Yann Tiersen : La Dispute - imitation musette (2'20)", "4, 133, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Le_Fabuleux_Destin_d%27Am%C3%A9lie_Poulain_(bande_originale)#p-lang-btn"),
-            new Title("HIMMEL.MID", "J.S. Bach : Nun schleuss den Himmel auf (2'10)", "5, 125, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Orgelb%C3%BCchlein#p-lang-btn"),
-            new Title("TODESBAND.MID", "J.S. Bach : Christ lag in Todesbanden (1'30)", "2, 90, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Orgelb%C3%BCchlein#p-lang-btn"),
-            new Title("CHACONNE.MID", "Johann Pachelbel : Chaconne en fa mineur (10')", "5, 607, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Chaconne_en_fa_mineur_(Pachelbel)#p-lang-btn"),
-            new Title("CANTABIL.MID", "Charles-Marie Widor : Andante cantabile de la 3ème symphonie (5'30)", "5, 330, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Charles-Marie_Widor#p-lang-btn"),
-            new Title("BOELMANN.mid", "Léon Boëllmann : Toccata de la suite gothique (3'45)", "4, 223, 2", d3m, 120, "https://en.wikipedia.org/wiki/Suite_Gothique#p-lang-btn"),
-            new Title("Reset19.mid", "Série de combinaison n° 19 (pas de notes)", "1,2,1", null, 100, null)
+            new Title("LISZT.MID", "Franz Liszt : Prélude et Fugue sur B.A.C.H. (10')", "15, 617, 20", lml, 100, "https://fr.wikipedia.org/wiki/Fantasie_und_Fuge_%C3%BCber_das_Thema_B-A-C-H#p-lang-btn", BACH),
+            new Title("WAGNER.MID", "Richard Wagner : Mort de Isolde, transcription (8'40)", "8, 510, 2", lml, 100, "https://fr.wikipedia.org/wiki/Liebestod#p-lang-btn", null),
+            new Title("DUPRE.MID", "Marcel Dupré : Prélude et Fugue en sol mineur (7')", "12, 403, 10", lml, 100, "https://fr.wikipedia.org/wiki/Marcel_Dupr%C3%A9#p-lang-btn", null),
+            new Title("FRANCK.MID", "César Franck : Troisième Choral (10'20)", "13, 622, 20", lml, 100, "https://fr.wikipedia.org/wiki/C%C3%A9sar_Franck#p-lang-btn", null),
+
+            new Title("MESSIAEN.MID", "Olivier Messiaen : Banquet céleste (6')", "5, 375, 19", d3m, 100, "https://en.wikipedia.org/wiki/Le_Banquet_C%C3%A9leste#p-lang-btn", null),
+            new Title("ASCENSIO.MID", "Olivier Messiaen : Prière du Christ montant vers son Père (7')", "8, 425, 10", d3m, 100, "https://fr.wikipedia.org/wiki/Olivier_Messiaen#p-lang-btn", null),
+            new Title("COUPERIN.MID", "François Couperin : Tierce en taille (4')", "6, 240, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Fran%C3%A7ois_Couperin#p-lang-btn", null),
+            new Title("OBOE.MID", "Alessandro Marcello / JS Bach : Concerto en Ré mineur (4'40)", "4, 276, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Concerto_pour_hautbois_en_r%C3%A9_mineur_de_Marcello#p-lang-btn", null),
+            new Title("CHROMORN.MID", "François Couperin : Chromorne en taille (4')", "5, 233, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Fran%C3%A7ois_Couperin#p-lang-btn", null),
+            new Title("BUXTEHUD.MID", "Dietrich Buxtehude : Passacaille en Ré mineur (7')", "5, 420, 5", d3m, 100, "https://fr.wikipedia.org/wiki/Passacaille_en_r%C3%A9_mineur_de_Buxtehude#p-lang-btn", null),
+            new Title("LANGLAIS.MID", "Jean Langlais : Chant de Paix (2'30)", "4, 150, 4", d3m, 100, "https://fr.wikipedia.org/wiki/Jean_Langlais#p-lang-btn", null),
+            new Title("GUILMANT.MID", "Alexandre Guilmant : Noël 'Or dites-nous Marie' (2'20)", "6, 130, 4", d3m, 100, "https://fr.wikipedia.org/wiki/Alexandre_Guilmant#p-lang-btn", null),
+            new Title("DISPUTE.MID", "Yann Tiersen : La Dispute - imitation musette (2'20)", "4, 133, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Le_Fabuleux_Destin_d%27Am%C3%A9lie_Poulain_(bande_originale)#p-lang-btn", null),
+            new Title("HIMMEL.MID", "J.S. Bach : Nun schleuss den Himmel auf (2'10)", "5, 125, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Orgelb%C3%BCchlein#p-lang-btn", null),
+            new Title("TODESBAND.MID", "J.S. Bach : Christ lag in Todesbanden (1'30)", "2, 90, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Orgelb%C3%BCchlein#p-lang-btn", null),
+            new Title("BACH_846.mid", "J.S. Bach: Prélude en Do Majeur BWV 846 (2'25)", "4, 138, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Pr%C3%A9lude_et_fugue_en_ut_majeur_(BWV_846)#p-lang-btn", null),
+            new Title("TOCAREM.MID", "J.S. Bach : Toccata en Ré mineur (2'30)", "2, 145, 5", d3m, 100, "https://fr.wikipedia.org/wiki/Toccata_et_fugue_en_r%C3%A9_mineur#p-lang-btn", null),
+            new Title("CHACONNE.MID", "Johann Pachelbel : Chaconne en fa mineur (10')", "5, 607, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Chaconne_en_fa_mineur_(Pachelbel)#p-lang-btn", null),
+            new Title("CANTABIL.MID", "Charles-Marie Widor : Andante cantabile de la 3ème symphonie (5'30)", "5, 330, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Charles-Marie_Widor#p-lang-btn", null),
+            new Title("BOELMANN.mid", "Léon Boëllmann : Toccata de la suite gothique (3'45)", "4, 223, 2", d3m, 120, "https://en.wikipedia.org/wiki/Suite_Gothique#p-lang-btn", null),
+            new Title("Reset19.mid", "Série de combinaison n° 19 (pas de notes)", "1,2,1", null, 100, null, null)
         };
         
         // MIDI files location on the server, also used to store new recordings
@@ -189,7 +193,11 @@ setTimeout(doRefresh, "+(1000*period).ToString()+@")
 
             Message += "<td align=right><a id='refresh' href='/'> Actualiser</a></td>";
             Message += "</tr></table>";
-            if (showCountDown) CountDown();
+            if (currentTitle.score != null)
+            {
+                Message += @"<video width=100% id=""score""><source src=""" + currentTitle.score.video + @""" ></video>";
+            }
+            CountDown(showCountDown);
             if (currentTitle.doc != null)
             {
                 Message += @"<iframe width=100% height=400px src=""" + currentTitle.doc+@""" title=""Wikipedia""></iframe> ";
@@ -203,16 +211,28 @@ setTimeout(doRefresh, "+(1000*period).ToString()+@")
         // - unload: delay after the last note is played
         // - current: the current position in the play
         // The javascript countDown function will refresh the HTML variable with id countDown at 'rate' period with the current phase and the remaining time in this phase
-        private void CountDown() 
-        { 
+        private void CountDown(Boolean run) 
+        {
+            int scoreSpeed = 100;
+            int scoreOffset = 0;
+            // if a score is attached to the current title
+            if (currentTitle.score != null)
+            {
+                scoreSpeed = currentTitle.score.speed;
+                scoreOffset = currentTitle.score.offset;
+            }
             Message += @"<p id=""countDown""></p>
 <script>
 var distances=[" + currentTitle.timing + ","+Title.GetElapsed(currentTitle.speed)+ @"]
+var run="+run.ToString().ToLower()+ @"
+var scoreSpeed="+ scoreSpeed + @"
+var scoreOffset=" + scoreOffset + @"
 var phases=[""Chargement : "", ""Exécution : "", ""Déchargement : ""]
 // Update the count down every 1 second
 var rate=1000;
 var phase=0;
 var elapsed = distances[phases.length]
+var scoreCurrentTime = elapsed
 phases.forEach(function(p, i){
   if(elapsed <= distances[i]){
     distances[i]-=elapsed
@@ -225,6 +245,7 @@ phases.forEach(function(p, i){
 })
 var distance = distances[phase]
 var refreshLink = document.getElementById(""refresh"")
+var score = document.getElementById (""score"");
 function doRefresh(){
   refreshLink.click();
 }
@@ -240,8 +261,20 @@ function countDown() {
   distance--
 }
 
-if(rate)setTimeout(countDown, rate);
-setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+4))
+if(run){
+    if(rate)setTimeout(countDown, rate);
+    setTimeout(doRefresh, 1000*(distances[0]+distances[1]+distances[2]-distances[3]+4))
+}
+
+if(score){
+    score.currentTime=(scoreCurrentTime-scoreOffset)*scoreSpeed/100
+    score.playbackRate = scoreSpeed/100
+    if(run){
+        score.play(); 
+    }else{
+        score.pause();
+    }
+}
 </script>
 ";
         }
