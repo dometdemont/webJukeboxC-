@@ -30,6 +30,11 @@ dedicated to driving the swell boxes. More details in the Forward implementation
 
 The Forwarding ends when the user hits the Stop link on the web page.
 
+# Application server build and launch
+- The application is built from Visual Studio: Build > Publish.
+- It is typically launched from a Windows shorcut using the --urls options pointing to the IP address allocated on the local WiFi network on the port 5000: 
+C:\Users\domin\source\repos\WebJukebox\WebJukebox\bin\Debug\net6.0\publish\WebJukebox.exe --urls=http://192.168.43.166:5000
+
 # Implementation
 This application is based on the outstanding Melanchall.DryWetMidi C# library.
 
