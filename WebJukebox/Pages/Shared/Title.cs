@@ -82,7 +82,7 @@ namespace WebJukebox.Pages.Shared
             "Imitation musette: Voix céleste, clarinette, Quintaton, Flûte creuse"
         };
 
-        public Title(string aFile, string aDescription, string aTiming, string? aPerformer, int aSpeed, string? aDoc, Score? aScore)
+        public Title(string aFile, string aDescription, string aTiming, string? aPerformer, int aSpeed, string? aDoc, Score? aScore, bool deletable)
         {
             // The MIDI file to playback
             file = aFile;
@@ -98,6 +98,7 @@ namespace WebJukebox.Pages.Shared
             performer = aPerformer;
             // Playback speed in %, ie 100=normal speed, 50 half speed, etc.
             speed = aSpeed;
+            this.deletable = deletable;
         }
         public static string getLastError() { string err = lastError; lastError = null; return err; }
         public static bool IsPlaying() { return _playback != null && _playback.IsRunning; }
@@ -160,7 +161,7 @@ namespace WebJukebox.Pages.Shared
             return new Title(
                 "EMPTY.MID",
                 "Forwarded " + DateTime.Now.ToString(),
-                "1,2,1", null, 100, null, null);
+                "1,2,1", null, 100, null, null, true);
         }
         // Start a new recording on the input device
         // Name the file using the current date and time to make it unique
@@ -176,7 +177,7 @@ namespace WebJukebox.Pages.Shared
             return new Title(
                 "Recorded" + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".mid",
                 "Enregistrement " + DateTime.Now.ToString(),
-                "1,2,1", null, 100, null, null);
+                "1,2,1", null, 100, null, null, true);
         }
         public static String getRecordingInfo()
         {
@@ -381,5 +382,6 @@ namespace WebJukebox.Pages.Shared
         public Score score;
         public string performer;
         public int speed;
+        public bool deletable;
     }
 }

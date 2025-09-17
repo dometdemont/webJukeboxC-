@@ -16,8 +16,10 @@ namespace WebJukebox.Pages
     {
         // Message receives the dynamic html code
         public string Message { get; private set; } = "PageModel in C#";
-        
+
         // Shortcuts for known performers
+        private static readonly string bc = "Bruno Charnay";
+        private static readonly string vitor = "Vitor Sousa";
         private static readonly string d3m = "Dominique Domet de Mont";
         private static readonly string lml = "Louis-Marie Lardic";
 
@@ -26,33 +28,46 @@ namespace WebJukebox.Pages
 
         // The static playlist
         private static Title[] playList = {
-            // The first item is reserved for live recording: file and timing will be updated when record is complete.
+            // The first items are reserved for live recording: file and timing will be updated when record is complete.
             // Since the file name is using the recording date & time, subsequent recordings do not override previous ones, even if the playlist shows only the latest
-            new Title("EMPTY.MID", "", "1,5,2", null, 100, null, null),
+            new Title("EMPTY.MID", "", "1,5,2", null, 100, null, null, true),
+            new Title("EMPTY.MID", "", "1,5,2", null, 100, null, null, true),
+            new Title("EMPTY.MID", "", "1,5,2", null, 100, null, null, true),
+            new Title("EMPTY.MID", "", "1,5,2", null, 100, null, null, true),
+            new Title("EMPTY.MID", "", "1,5,2", null, 100, null, null, true),
+            new Title("EMPTY.MID", "", "1,5,2", null, 100, null, null, true),
+            new Title("EMPTY.MID", "", "1,5,2", null, 100, null, null, true),
+            new Title("EMPTY.MID", "", "1,5,2", null, 100, null, null, true),
+            new Title("EMPTY.MID", "", "1,5,2", null, 100, null, null, true),
+            new Title("EMPTY.MID", "", "1,5,2", null, 100, null, null, true),
             
             // Other items are known and documented
-            new Title("LISZT.MID", "Franz Liszt : Prélude et Fugue sur B.A.C.H. (10')", "15, 617, 20", lml, 100, "https://fr.wikipedia.org/wiki/Fantasie_und_Fuge_%C3%BCber_das_Thema_B-A-C-H#p-lang-btn", BACH),
-            new Title("WAGNER.MID", "Richard Wagner : Mort de Isolde, transcription (8'40)", "8, 510, 2", lml, 100, "https://fr.wikipedia.org/wiki/Liebestod#p-lang-btn", null),
-            new Title("DUPRE.MID", "Marcel Dupré : Prélude et Fugue en sol mineur (7')", "12, 403, 10", lml, 100, "https://fr.wikipedia.org/wiki/Marcel_Dupr%C3%A9#p-lang-btn", null),
-            new Title("FRANCK.MID", "César Franck : Troisième Choral (10'20)", "13, 622, 20", lml, 100, "https://fr.wikipedia.org/wiki/C%C3%A9sar_Franck#p-lang-btn", null),
+            new Title("ADNOS.mid", "Franz Liszt : Ad nos, ad salutarem undam (28'10)", "1, 1700, 4", bc, 100, "https://fr.wikipedia.org/wiki/Fantaisie_et_Fugue_sur_le_choral_%C2%AB_Ad_nos,_ad_salutarem_undam_%C2%BB", null, false),
+            new Title("LISZT.MID", "Franz Liszt : Prélude et Fugue sur B.A.C.H. (10')", "15, 617, 4", lml, 100, "https://fr.wikipedia.org/wiki/Fantasie_und_Fuge_%C3%BCber_das_Thema_B-A-C-H#p-lang-btn", null, false),
+            new Title("WAGNER.MID", "Richard Wagner : Mort de Isolde, transcription (8'40)", "8, 510, 2", lml, 100, "https://fr.wikipedia.org/wiki/Liebestod#p-lang-btn", null, false),
+            new Title("DUPRE.MID", "Marcel Dupré : Prélude et Fugue en sol mineur (7')", "12, 403, 10", lml, 100, "https://fr.wikipedia.org/wiki/Marcel_Dupr%C3%A9#p-lang-btn", null, false),
+            new Title("FRANCK.MID", "César Franck : Troisième Choral (10'20)", "13, 622, 4", lml, 100, "https://fr.wikipedia.org/wiki/C%C3%A9sar_Franck#p-lang-btn", null, false),
+            new Title("NUPTIAL.MID", "Félix Mendelssohn: Marche nuptiale - introduction (0'30)", "4, 26, 1", d3m, 100, "https://fr.wikipedia.org/wiki/Marche_nuptiale#p-lang-btn", null, false),
 
-            new Title("MESSIAEN.MID", "Olivier Messiaen : Banquet céleste (6')", "5, 375, 19", d3m, 100, "https://en.wikipedia.org/wiki/Le_Banquet_C%C3%A9leste#p-lang-btn", null),
-            new Title("ASCENSIO.MID", "Olivier Messiaen : Prière du Christ montant vers son Père (7')", "8, 425, 10", d3m, 100, "https://fr.wikipedia.org/wiki/Olivier_Messiaen#p-lang-btn", null),
-            new Title("COUPERIN.MID", "François Couperin : Tierce en taille (4')", "6, 240, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Fran%C3%A7ois_Couperin#p-lang-btn", null),
-            new Title("OBOE.MID", "Alessandro Marcello / JS Bach : Concerto en Ré mineur (4'40)", "4, 276, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Concerto_pour_hautbois_en_r%C3%A9_mineur_de_Marcello#p-lang-btn", null),
-            new Title("CHROMORN.MID", "François Couperin : Chromorne en taille (4')", "5, 233, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Fran%C3%A7ois_Couperin#p-lang-btn", null),
-            new Title("BUXTEHUD.MID", "Dietrich Buxtehude : Passacaille en Ré mineur (7')", "5, 420, 5", d3m, 100, "https://fr.wikipedia.org/wiki/Passacaille_en_r%C3%A9_mineur_de_Buxtehude#p-lang-btn", null),
-            new Title("LANGLAIS.MID", "Jean Langlais : Chant de Paix (2'30)", "4, 150, 4", d3m, 100, "https://fr.wikipedia.org/wiki/Jean_Langlais#p-lang-btn", null),
-            new Title("GUILMANT.MID", "Alexandre Guilmant : Noël 'Or dites-nous Marie' (2'20)", "6, 130, 4", d3m, 100, "https://fr.wikipedia.org/wiki/Alexandre_Guilmant#p-lang-btn", null),
-            new Title("DISPUTE.MID", "Yann Tiersen : La Dispute - imitation musette (2'20)", "4, 133, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Le_Fabuleux_Destin_d%27Am%C3%A9lie_Poulain_(bande_originale)#p-lang-btn", null),
-            new Title("HIMMEL.MID", "J.S. Bach : Nun schleuss den Himmel auf (2'10)", "5, 125, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Orgelb%C3%BCchlein#p-lang-btn", null),
-            new Title("TODESBAND.MID", "J.S. Bach : Christ lag in Todesbanden (1'30)", "2, 90, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Orgelb%C3%BCchlein#p-lang-btn", null),
-            new Title("BACH_846.mid", "J.S. Bach: Prélude en Do Majeur BWV 846 (2'25)", "4, 138, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Pr%C3%A9lude_et_fugue_en_ut_majeur_(BWV_846)#p-lang-btn", null),
-            new Title("TOCAREM.MID", "J.S. Bach : Toccata en Ré mineur (2'30)", "2, 145, 5", d3m, 100, "https://fr.wikipedia.org/wiki/Toccata_et_fugue_en_r%C3%A9_mineur#p-lang-btn", null),
-            new Title("CHACONNE.MID", "Johann Pachelbel : Chaconne en fa mineur (10')", "5, 607, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Chaconne_en_fa_mineur_(Pachelbel)#p-lang-btn", null),
-            new Title("CANTABIL.MID", "Charles-Marie Widor : Andante cantabile de la 3ème symphonie (5'30)", "5, 330, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Charles-Marie_Widor#p-lang-btn", null),
-            new Title("BOELMANN.mid", "Léon Boëllmann : Toccata de la suite gothique (3'45)", "4, 223, 2", d3m, 120, "https://en.wikipedia.org/wiki/Suite_Gothique#p-lang-btn", null),
-            new Title("Reset19.mid", "Série de combinaison n° 19 (pas de notes)", "1,2,1", null, 100, null, null)
+            new Title("ASCMESSI.mid", "Olivier Messiaen : l'Ascension (1er mvt 5'40)", "1, 340, 2", vitor, 100, "https://fr.wikipedia.org/wiki/L%27Ascension_(version_pour_orgue)", null, false),
+            new Title("MESSIAEN.MID", "Olivier Messiaen : Banquet céleste (6')", "5, 375, 19", d3m, 100, "https://en.wikipedia.org/wiki/Le_Banquet_C%C3%A9leste#p-lang-btn", null, false),
+            new Title("ASCENSIO.MID", "Olivier Messiaen : Prière du Christ montant vers son Père (7')", "8, 425, 10", d3m, 100, "https://fr.wikipedia.org/wiki/Olivier_Messiaen#p-lang-btn", null, false),
+            new Title("COUPERIN.MID", "François Couperin : Tierce en taille (4')", "6, 240, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Fran%C3%A7ois_Couperin#p-lang-btn", null, false),
+            new Title("OBOE.MID", "Alessandro Marcello / JS Bach : Concerto en Ré mineur (4'40)", "4, 276, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Concerto_pour_hautbois_en_r%C3%A9_mineur_de_Marcello#p-lang-btn", null, false),
+            new Title("CHROMORN.MID", "François Couperin : Chromorne en taille (4')", "5, 233, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Fran%C3%A7ois_Couperin#p-lang-btn", null, false),
+            new Title("BUXTEHUD.MID", "Dietrich Buxtehude : Passacaille en Ré mineur (7')", "5, 420, 5", d3m, 100, "https://fr.wikipedia.org/wiki/Passacaille_en_r%C3%A9_mineur_de_Buxtehude#p-lang-btn", null, false),
+            new Title("LANGLAIS.MID", "Jean Langlais : Chant de Paix (2'30)", "4, 150, 4", d3m, 100, "https://fr.wikipedia.org/wiki/Jean_Langlais#p-lang-btn", null, false),
+            new Title("GUILMANT.MID", "Alexandre Guilmant : Noël 'Or dites-nous Marie' (2'20)", "6, 130, 4", d3m, 100, "https://fr.wikipedia.org/wiki/Alexandre_Guilmant#p-lang-btn", null, false),
+            new Title("DISPUTE.MID", "Yann Tiersen : La Dispute - imitation musette (2'20)", "4, 133, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Le_Fabuleux_Destin_d%27Am%C3%A9lie_Poulain_(bande_originale)#p-lang-btn", null, false),
+            new Title("HIMMEL.MID", "J.S. Bach : Nun schleuss den Himmel auf (2'10)", "5, 125, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Orgelb%C3%BCchlein#p-lang-btn", null, false),
+            new Title("TODESBAND.MID", "J.S. Bach : Christ lag in Todesbanden (1'30)", "2, 90, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Orgelb%C3%BCchlein#p-lang-btn", null, false),
+            new Title("BWV846.mid", "J.S. Bach: Prélude en Do Majeur BWV 846 (2'25)", "6, 135, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Pr%C3%A9lude_et_fugue_en_ut_majeur_(BWV_846)#p-lang-btn", null, false),
+            new Title("BWV853.mid", "J.S. Bach: Prélude en Mib Mineur BWV 853 (3'22)", "2, 200, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Pr%C3%A9lude_et_fugue_en_mi_b%C3%A9mol_mineur_(BWV_853)#p-lang-btn", null , false),
+            new Title("TOCAREM.MID", "J.S. Bach : Toccata en Ré mineur (2'30)", "2, 145, 5", d3m, 100, "https://fr.wikipedia.org/wiki/Toccata_et_fugue_en_r%C3%A9_mineur#p-lang-btn", null, false),
+            new Title("CHACONNE.MID", "Johann Pachelbel : Chaconne en fa mineur (10')", "5, 607, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Chaconne_en_fa_mineur_(Pachelbel)#p-lang-btn", null, false),
+            new Title("CANTABIL.MID", "Charles-Marie Widor : Andante cantabile de la 3ème symphonie (5'30)", "5, 330, 2", d3m, 100, "https://fr.wikipedia.org/wiki/Charles-Marie_Widor#p-lang-btn", null, false),
+            new Title("BOELMANN.mid", "Léon Boëllmann : Toccata de la suite gothique (3'45)", "4, 223, 2", d3m, 120, "https://en.wikipedia.org/wiki/Suite_Gothique#p-lang-btn", null, false),
+            new Title("Reset19.mid", "Série de combinaison n° 19 (pas de notes)", "1,2,1", null, 100, null, null, false)
         };
         
         // MIDI files location on the server, also used to store new recordings
@@ -60,12 +75,13 @@ namespace WebJukebox.Pages
 
         // List of ids accepted on GET requests: 
         // - 0..N-1: the title to play
-        // - N... commands stop, pause, resume, record
+        // - N... commands stop, pause, resume, record...
         private static int stopId = playList.Length;
         private static int pauseId = stopId+1;
         private static int resumeId = pauseId+1;
         private static int recordId = resumeId + 1;
         private static int forwardId = recordId + 1;
+        private static int deleteId = forwardId + 1;
 
         private static Title? currentTitle =null;
 
@@ -112,7 +128,7 @@ namespace WebJukebox.Pages
                 Message += "<h3>Liste des pièces disponibles</h3><ul>";
                 for (int i = 0; i < playList.Length; i++)
                 {
-                    Message += "<li><a href=" + i + " title='Interprétation : " + playList[i].performer + "'>" + playList[i].description  +"</a></li>";
+                    if(playList[i].description != "") Message += "<li><a href=" + i + " title='Interprétation : " + playList[i].performer + "'>" + playList[i].description + "</a></li>";
                 };
                 Message += "</ul>";
             }
@@ -120,7 +136,7 @@ namespace WebJukebox.Pages
             {
                 Message = "<h3>Aucun périphérique de sortie MIDI détecté/h3>";
             }
-            Message += "<h6>&copy 2022 Orgue et Musique Sacrée à la Basilique St Joseph de Grenoble</h6>";
+            Message += "<h6>&copy 2025 Orgue et Musique Sacrée à la Basilique St Joseph de Grenoble</h6>";
             
         }
         // Builds a javascript fragment enabling auto refresh at a period second rate 
@@ -201,6 +217,10 @@ setTimeout(doRefresh, "+(1000*period).ToString()+@")
             if (currentTitle.doc != null)
             {
                 Message += @"<iframe width=100% height=400px src=""" + currentTitle.doc+@""" title=""Wikipedia""></iframe> ";
+            }
+            if (currentTitle.deletable) 
+            {
+                Message += "<a style='color:red;' href=" + deleteId + ">Supprimer</a>";
             }
         }
         
@@ -302,10 +322,21 @@ if(score){
                     {
                         Current(Title.IsPlaying());
                     }
-                    
-                } else if(id == stopId) {
+
+                }
+                else if (id == stopId)
+                {
                     _logger.LogInformation("Stopping id: {int}", id);
-                    if(currentTitle != null)currentTitle.Cancel();
+                    if (currentTitle != null) currentTitle.Cancel();
+                    Welcome();
+                }
+                else if(id == deleteId) {
+                    _logger.LogInformation("Deleting id: {int}", id);
+                    if (currentTitle != null)
+                    {
+                        currentTitle.Cancel();
+                        currentTitle.description = "";
+                    }
                     Welcome();
                 }
                 else if (id == pauseId)
@@ -325,8 +356,10 @@ if(score){
                     if (Title.IsFree())
                     {
                         _logger.LogInformation("Starting new recording");
-                        // Store the new recording in the first element of the playlist
-                        playList[0] = currentTitle = Title.Record();
+                        // Store the new recording in the first free element of the playlist, fallback to the first element
+                        int iPlay = 0;
+                        for (int i = 0; i < playList.Length; i++) if (playList[i].description == "") { iPlay = i; break; }
+                        playList[iPlay] = currentTitle = Title.Record();
                         Record();
                     }
                     else if (Title.IsRecording())
